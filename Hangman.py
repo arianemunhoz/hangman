@@ -1,5 +1,4 @@
 import random
-# TODO-1: - Update the word list to use the 'word_list' from hangman_words.py
 from hangman_words import word_list
 
 logo = r''' 
@@ -8,8 +7,8 @@ logo = r'''
 | |__   __ _ _ __   __ _ _ __ ___   __ _ _ __  
 | '_ \ / _` | '_ \ / _` | '_ ` _ \ / _` | '_ \ 
 | | | | (_| | | | | (_| | | | | | | (_| | | | |
-|_| |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_| 
-                    __/ |                       
+|_| |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_|
+                    __/ |                      
                    |___/    '''
 
 stages = [r'''+---+
@@ -62,90 +61,73 @@ stages = [r'''+---+
       |
 =========''']
 
-lives = 6
-wrong_guesses = 0
+def play_game():
+    lives = 6
+    wrong_guesses = 0
+    chosen_word = random.choice(word_list)
+    word_length = len(chosen_word)
+    display = "_" * word_length
+    correct_letters = []
+    used_letters = []
 
-# TODO-3: - Import the logo from hangman_art.py and print it at the start of the game.
-print("=*" * 25)
-print(logo)
-print("=*" * 25)
-
-chosen_word = random.choice(word_list)
-print(chosen_word)
-
-placeholder = ""
-word_length = len(chosen_word)
-for position in range(word_length):
-    placeholder += "_"
-
-print(f"A palavra tem {word_length} letras.")
-print("Word to guess: " + placeholder)
-
-game_over = False
-correct_letters = []
-used_letters = []
-
-while not game_over:
-
-    # TODO-6: - Update the code below to tell the user how many lives they have left.
-    print(f"Vidas restantes: {lives}/6")
-    print(f"Tentativas erradas: {wrong_guesses}")
-    print(f"Letras já usadas: {', '.join(used_letters)}")
-    
-    while True:
-        guess = input("Guess a letter: ").lower()
-        if len(guess) != 1 or not guess.isalpha():
-            print("Por favor, insira uma única letra válida.")
-        else:
-            break
-
-    if guess in used_letters:
-        print(f"You've already used this letter {used_letters}. Try another!")
-        continue
-    else:
-        used_letters.append(guess)
-
-    display = ""
-
-    for letter in chosen_word:
-        if letter == guess:
-            display += letter
-            correct_letters.append(guess)
-        elif letter in correct_letters:
-            display += letter
-        else:
-            display += "_"
-
+    print("=*" * 25)
+    print(logo)
+    print("=*" * 25)
+    print(f"The word has {word_length} letters.")
     print("Word to guess: " + display)
 
-    # TODO-5: - If the letter is not in the chosen_word, print out the letter and let them know it's not in the word.
-    if guess not in chosen_word:
-        lives -= 1
-        wrong_guesses += 1
-        print(f"You guessed {guess}, that's not in the word. You lose a life.")
-        print(f"Vidas restantes: {lives}/6")
+    game_over = False
 
-        if lives == 0:
-            game_over = True
-            print(f"***********************YOU LOSE**********************\nThe word was {chosen_word}.")
+    while not game_over:
+        print(f"\nLives left: {lives}/6")
+        print(f"Wrong guesses: {wrong_guesses}")
+        print(f"Used letters: {', '.join(used_letters)}")
 
-    if "_" not in display:
-        game_over = True
-        print(f"****************************YOU WIN****************************\nThe word is {chosen_word}!")
+        while True:
+            guess = input("Guess a letter: ").lower()
+            if len(guess) != 1 or not guess.isalpha():
+                print("Please enter a single valid letter.")
+            elif guess in used_letters:
+                print(f"You've already used '{guess}'. Try another!")
+            else:
+                break
 
-    print(stages[lives])
+        used_letters.append(guess)
+        new_display = ""
 
-    if game_over:
-        restart = input("Do you want to play again? Type 'y' for yes or 'n' for no: ").lower()
-        if restart == 'y':
-            # Reinicia as variáveis
-            lives = 6
-            wrong_guesses = 0
-            chosen_word = random.choice(word_list)
-            display = "_" * len(chosen_word)
-            correct_letters = []
-            used_letters = []
-            game_over = False
+        for letter in chosen_word:
+            if letter == guess or letter in correct_letters:
+                new_display += letter
+            else:
+                new_display += "_"
+
+        if guess in chosen_word:
+            correct_letters.append(guess)
         else:
-            print("Thanks for playing! Goodbye!")
-            break  # Sai do jogo
+            lives -= 1
+            wrong_guesses += 1
+            print(f"You guessed '{guess}', that's not in the word. You lose a life.")
+
+        print("Word to guess: " + new_display)
+        print(stages[lives])
+        display = new_display
+
+        if "_" not in display:
+            print(f"\n************** YOU WIN **************")
+            print(f"The word is '{chosen_word}'!")
+            game_over = True
+
+        elif lives == 0:
+            print(f"\n************** YOU LOSE **************")
+            print(f"The word was '{chosen_word}'.")
+            game_over = True
+
+    # Restart prompt
+    restart = input("\nDo you want to play again? Type 'y' for yes or 'n' for no: ").lower()
+    if restart == 'y':
+        play_game()
+    else:
+        print("Thanks for playing! Goodbye!")
+
+# Start the game
+play_game()
